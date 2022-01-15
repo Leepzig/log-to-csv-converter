@@ -2,6 +2,7 @@ const fs = require('fs')
 const path =require('path')
 var zlib = require('zlib')
 const readline = require('readline');
+const myArgs = process.argv.slice(2);
 
 //returns a boolean for if file is a directory
 const isDir = (filePath) => {
@@ -38,10 +39,12 @@ const writeToCsv = filePath => {
 //records only the zipped files
 const filterZipped = (filePath) => {
     const filesNotLogged = []
+    console.log(path.extname(filePath))
     if (path.extname(filePath) === '.gz') {
         writeToCsv(filePath)
     } else {
         filesNotLogged.push(filePath)
+        console.log(filePath)
         if (filesNotLogged[0]) console.log(`There were ${filesNotLogged.length}: \n${filesNotLogged}`)
     }
 }
@@ -65,7 +68,7 @@ const drillDownToFiles = (rootPath, folder) => {
 }
 
 //Used to execute Looping through files:
-const awsLogs = "AWSLogs"
-const rootPath = path.join(__dirname, awsLogs)
-drillDownToFiles(rootPath, awsLogs)
+const filesToBeCombined = myArgs[0]
+const rootPath = path.join(__dirname, filesToBeCombined)
+drillDownToFiles(rootPath, filesToBeCombined)
 
