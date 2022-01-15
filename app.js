@@ -1,8 +1,10 @@
 const fs = require('fs')
 const path =require('path')
-var zlib = require('zlib')
+const zlib = require('zlib')
 const readline = require('readline');
 const myArgs = process.argv.slice(2);
+const headers = "version,account-id,interface-id,srcaddr,dstaddr,srcport,dstport,protocol,packets,bytes,start,end,action,log-status"
+
 
 //returns a boolean for if file is a directory
 const isDir = (filePath) => {
@@ -15,7 +17,7 @@ const createLogsFile = () => {
     const logFile = 'logs.csv'
     fs.access(logFile, fs.constants.F_OK, (err) => {
         if (err) {
-            const headers = "version,account-id,interface-id,srcaddr,dstaddr,srcport,dstport,protocol,packets,bytes,start,end,action,log-status"
+            // const headers = "version,account-id,interface-id,srcaddr,dstaddr,srcport,dstport,protocol,packets,bytes,start,end,action,log-status"
             fs.writeFileSync(logFile, headers)
         } 
       });
@@ -36,16 +38,21 @@ const writeToCsv = filePath => {
     });
 }
 
+const notLoggedFileNotification = fileNotLogged => {
+    if (fileNotLogged !== null) {
+        console.log("There were files not logged:")
+        console.log(fileNotLogged + '\n')
+    }
+}
+
 //records only the zipped files
 const filterZipped = (filePath) => {
-    const filesNotLogged = []
-    console.log(path.extname(filePath))
+    let fileNotLogged = null
     if (path.extname(filePath) === '.gz') {
         writeToCsv(filePath)
     } else {
-        filesNotLogged.push(filePath)
-        console.log(filePath)
-        if (filesNotLogged[0]) console.log(`There were ${filesNotLogged.length}: \n${filesNotLogged}`)
+        fileNotLogged = filePath
+        notLoggedFileNotification(fileNotLogged)
     }
 }
 
@@ -60,7 +67,8 @@ const drillDownToFiles = (rootPath, folder) => {
    } else {
         createLogsFile()
         fs.readdirSync(folder).forEach(fileName => {
-            filterZipped(dirPath)
+            const file = path.join(folder, fileName)
+            filterZipped(file)
         })
         //I need to write a test that actually test whether that's true or not.
         console.log("Files have been succesfully logged")
