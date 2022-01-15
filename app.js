@@ -2,8 +2,10 @@ const fs = require('fs')
 const path =require('path')
 const zlib = require('zlib')
 const readline = require('readline');
-const myArgs = process.argv.slice(2);
+
+// These are the headers that will be put on the first line of the csv file
 const headers = "version,account-id,interface-id,srcaddr,dstaddr,srcport,dstport,protocol,packets,bytes,start,end,action,log-status"
+const myArgs = process.argv.slice(2);
 
 
 //returns a boolean for if file is a directory
@@ -17,7 +19,6 @@ const createLogsFile = () => {
     const logFile = 'logs.csv'
     fs.access(logFile, fs.constants.F_OK, (err) => {
         if (err) {
-            // const headers = "version,account-id,interface-id,srcaddr,dstaddr,srcport,dstport,protocol,packets,bytes,start,end,action,log-status"
             fs.writeFileSync(logFile, headers)
         } 
       });
@@ -25,7 +26,7 @@ const createLogsFile = () => {
 }
 
 const writeToCsv = filePath => {
-    const logFile = 'logs.csv'
+    const logFile = createLogsFile()
     const writeStream = fs.createWriteStream(logFile, {flags:'a'});
     let lineReader = readline.createInterface({
         input: fs.createReadStream(filePath).pipe(zlib.createGunzip()),
@@ -75,7 +76,8 @@ const drillDownToFiles = (rootPath, folder) => {
     }
 }
 
-//Used to execute Looping through files:
+
+//File Execution:
 const filesToBeCombined = myArgs[0]
 const rootPath = path.join(__dirname, filesToBeCombined)
 drillDownToFiles(rootPath, filesToBeCombined)
