@@ -59,6 +59,7 @@ const filterZipped = (filePath) => {
 
 // using recursion, drills down to the files
 const drillDownToFiles = (rootPath, folder) => {
+    // How to do error handling with this kind of thing?
     const dirTitle = fs.readdirSync(folder)[1]
     const dirPath = path.join(rootPath, dirTitle)
     const newFolderPath = `${folder}/${dirTitle}`
@@ -66,9 +67,10 @@ const drillDownToFiles = (rootPath, folder) => {
     if (isDir(dirPath)) {
         drillDownToFiles(dirPath, newFolderPath)
    } else {
-        createLogsFile()
+        // createLogsFile()
         fs.readdirSync(folder).forEach(fileName => {
             const file = path.join(folder, fileName)
+            // console.log("Function drilldown ran sucessfully.")
             filterZipped(file)
         })
         //I need to write a test that actually test whether that's true or not.
